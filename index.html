@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>SAPECA AUX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style>
+:root{
+  --pink:#ff1fa3;
+  --green:#39ff6a;
+  --glow:0 0 18px rgba(255,31,163,.85);
+  --radius:16px;
+}
+*{
+  box-sizing:border-box;
+  font-family:Arial,Helvetica,sans-serif;
+  user-select:none;
+}
+html,body{
+  margin:0;
+  height:100%;
+  overflow:hidden;
+}
+
+/* 🌌 GALAXIA */
+body{
+  background:
+    radial-gradient(circle at 20% 20%,#3a0020,transparent 40%),
+    radial-gradient(circle at 80% 30%,#12002a,transparent 45%),
+    radial-gradient(circle at 50% 80%,#000428,transparent 50%),
+    #000;
+  animation:galaxy 30s linear infinite;
+  color:#fff;
+}
+@keyframes galaxy{
+  0%{background-position:0 0,0 0,0 0}
+  100%{background-position:300px 200px,-300px 300px,200px -300px}
+}
+
+/* ✨ PARTÍCULAS */
+canvas{
+  position:fixed;
+  inset:0;
+  z-index:0;
+}
+
+/* 🔒 LOGIN */
+#login{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.92);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+}
+.login-box{
+  width:220px;
+  padding:16px;
+  background:#000;
+  border:2px solid var(--pink);
+  border-radius:var(--radius);
+  box-shadow:var(--glow);
+  text-align:center;
+}
+.login-box input{
+  width:100%;
+  padding:9px;
+  margin-bottom:10px;
+  background:#050505;
+  border:1px solid var(--pink);
+  border-radius:12px;
+  color:#fff;
+  text-align:center;
+}
+.login-box button{
+  width:100%;
+  padding:9px;
+  background:var(--pink);
+  border:none;
+  border-radius:12px;
+  color:#fff;
+  font-weight:bold;
+}
+.attempts{
+  margin-top:6px;
+  font-size:11px;
+  opacity:.8;
+}
+
+/* 🧩 APP */
+#app{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1;
+  position:relative;
+}
+.hidden{display:none}
+
+.container{
+  width:300px;
+  height:420px;
+  background:linear-gradient(180deg,#16000d,#000);
+  border:2px solid var(--pink);
+  border-radius:var(--radius);
+  box-shadow:var(--glow);
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+}
+.title{
+  text-align:center;
+  font-weight:900;
+  letter-spacing:2px;
+  color:var(--pink);
+  margin-bottom:6px;
+  text-shadow:0 0 10px var(--pink);
+  font-size:15px;
+}
+.status{
+  text-align:center;
+  font-size:12px;
+  margin-bottom:8px;
+}
+.status span{
+  color:#ff3b3b;
+  font-weight:bold;
+}
+.status.online span{
+  color:var(--green);
+}
+
+.btn{
+  padding:12px;
+  background:var(--pink);
+  border:none;
+  border-radius:14px;
+  color:#fff;
+  font-weight:bold;
+  .btn:active{
+  transform: scale(0.96);
+  box-shadow: 0 0 20px rgba(255,31,163,.9);
+}
+  cursor:pointer;
+  margin-bottom:10px;
+}
+.console{
+  flex:1;
+  background:#000;
+  border:1px solid #222;
+  border-radius:12px;
+  padding:8px;
+  font-family:monospace;
+  font-size:11px;
+  color:#ff4d4d;
+  overflow:hidden;
+}
+.footer{
+  text-align:center;
+  margin-top:6px;
+  font-size:11px;
+}
+.footer a{
+  color:var(--pink);
+  text-decoration:none;
+}
+.green{color:var(--green)}
+</style>
+</head>
+<body>
+
+<canvas id="fx"></canvas>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <input type="password" id="key" placeholder="KEY">
+    <button onclick="login()">ENTRAR</button>
+    <div class="attempts" id="att">Intentos: 3</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <div class="container">
+    <div class="title">SAPECA AUX</div>
+
+    <div class="status" id="status">
+      STATUS: <span>OFFLINE</span>
+    </div>
+
+    <button class="btn" onclick="inject()">INJECTAR ARCHIVOS</button>
+
+    <div class="console" id="log"></div>
+
+    <div class="footer">
+      TikTok • <a href="https://www.tiktok.com/@crxzzpxrtillo" target="_blank">
+      @crxzzpxrtillo</a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* 🔑 LOGIN */
+const PASSWORD="XT7";
+let tries=3;
+
+function login(){
+  const k=document.getElementById("key").value;
+  if(k===PASSWORD){
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").classList.remove("hidden");
+  }else{
+    tries--;
+    document.getElementById("att").innerText="Intentos: "+tries;
+    if(tries<=0){
+      alert("Acceso bloqueado");
+      document.querySelector(".login-box button").disabled=true;
+    }
+  }
+}
+
+/* 🔀 RANDOM */
+function randStr(len){
+  const c="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*";
+  let s="";
+  for(let i=0;i<len;i++) s+=c[Math.floor(Math.random()*c.length)];
+  return s;
+}
+
+/* 🧪 INJECT + ABRIR FF */
+function inject(){
+  const log=document.getElementById("log");
+  const status=document.getElementById("status");
+
+  status.classList.add("online");
+  status.innerHTML="STATUS: <span>ONLINE</span>";
+
+  log.innerHTML="";
+  let i=0;
+  const t=setInterval(()=>{
+    if(i<10){
+      log.innerHTML+="[OK] com.dts.freefireth → "+randStr(18)+"<br>";
+      log.scrollTop=log.scrollHeight;
+      i++;
+    }else{
+      log.innerHTML+='<span class="green">[SUCCESS] Inyección completa</span>';
+      clearInterval(t);
+
+      /* ⏱️ abrir Free Fire después de 2s */
+      setTimeout(()=>{
+        window.location.href="intent://#Intent;package=com.dts.freefireth;end";
+      },2000);
+    }
+  },180);
+}
+
+/* ✨ PARTÍCULAS */
+const c=document.getElementById("fx"),x=c.getContext("2d");
+let w,h,p=[];
+function resize(){
+  w=c.width=innerWidth;
+  h=c.height=innerHeight;
+}
+window.onresize=resize; resize();
+
+for(let i=0;i<60;i++){
+  p.push({
+    x:Math.random()*w,
+    y:Math.random()*h,
+    r:Math.random()*2+0.5,
+    s:Math.random()*0.6+0.2
+  });
+}
+function draw(){
+  x.clearRect(0,0,w,h);
+  x.fillStyle="rgba(255,255,255,.8)";
+  p.forEach(o=>{
+    o.y-=o.s;
+    if(o.y<0) o.y=h;
+    x.beginPath();
+    x.arc(o.x,o.y,o.r,0,Math.PI*2);
+    x.fill();
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+
+</body>
+</html>
